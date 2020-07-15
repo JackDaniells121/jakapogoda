@@ -8,8 +8,9 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/weather-icons.min.css"/>
+    <link rel="stylesheet" href="css/weather-icons-wind.css"/>
 
-    
+    <script src="script.js"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
@@ -57,6 +58,11 @@
                                     <div id="result-temp"></div>
                                 </div>
                             </div>
+                            <div class="center">
+                                <div class="row">
+                                    <div id="result-sunrise"></div>
+                                </div>
+                            </div>
                         </div>
                         
                         <!-- spinner2 -->
@@ -73,11 +79,13 @@
                                 <table class="table table-striped" >
                                     <thead>
                                     <tr>
-                                        <th style="width: 30%">Data</th>
-                                        <th style="width: 5%"><i class="wi wi-day-sunny"></i></th>
+                                        <th style="width: 25%">Data</th>
+                                        <th style="width: 10%"><i class="wi wi-day-sunny" style="font-size: 1.5em;"></i></th>
                                         <th style="width: 15%">Temp</th>
                                         <th style="width: 15%">Opis</th>
-                                        <th style="width: 10%">Wiatr</th>
+                                        <th style="width: 25%">Wiatr</th>
+                                        <!-- <th style="width: 10%">Wiatr kierunek</th> -->
+                                        
                                     </tr>
                                     </thead>
                                     <tbody id="result2">     
@@ -101,110 +109,12 @@
 
 <script>
 
-//-----------
-function getWeather(){
-    $("#spinner").show();
-    $("#result-top").hide();
-    $.ajax({
-        url : 'get_weather.php',
-        data : { city :  $("#city").val() },
-        type : 'POST',
-        dataType : 'json',
-    
-        success : function(json) {
-            console.log(json);
-            console.log(json.weather[0].description);
-            $("#result").html("<h1>"+json.name+" ("+json.sys.country+")</h1>");
-            $("#result-temp").html("<h1>"+getCelciusSpan(json.main.temp)+" </h1>");
-            $("#result-icon").html(getWeatherIcon(json.weather[0].description,5));
-            //$("#result-temp").append("<div class=\"center\"<h6>"+getTime(json.dt)+"</h6></div>");
-            $("#spinner").hide();
-            $("#result-top").show();
-        },
-        error : function(xhr, status) {
-            alert('Przepraszamy, wystąpił problem!');
-        },
-        complete : function(xhr, status) {
-        }
-    });
-}
-//-----------
-function getForecast(){
-    $("#spinner2").show();
-    $("#result2").html("");
-    $.ajax({
-        url : 'get_forecast.php',
-        data : { city :  $("#city").val() },
-        type : 'POST',
-        dataType : 'json',
-    
-        success : function(json) {
-            console.log(json);
-            json.list.forEach(e => {
-                $("#result2").append("<tr><td>"+e.dt_txt.substring(0,16)+"</td><td>"+getWeatherIcon(e.weather[0].description)+"</td><td>"+getCelciusSpan(e.main.temp)+"</td><td>"+e.weather[0].description+"</td><td>"+e.wind.speed+"</td></tr>");
-            });
-            $("#spinner2").hide();
-        },
-        error : function(xhr, status) {
-            alert('Przepraszamy, wystąpił problem!');
-        },
-        complete : function(xhr, status) {
-        }
-    });
-}
-
-function getCelcius(val){
-    return Math.floor(val-272.15);
-    //return Math.round((val-272.15 + Number.EPSILON) * 100) / 100;
-}
-function getCelciusSpan(val){
-    return getCelcius(val)+'<span>&#8451;</span>';
-}
-
 $('#sprawdz-btn').click(function(){
     getWeather();
     getForecast();
 })
 getWeather();
 getForecast();
-
-
-function getWeatherIcon(description, size=1){
-    let result='<i class=\"';
-    switch (description)
-    {
-    case'clear sky':
-        result+='wi wi-day-sunny';
-        break;
-    case 'shower rain':
-    case 'moderate rain':
-    case 'light rain':
-        result+='wi wi-rain';
-        break;
-    
-    case 'overcast clouds':
-        result+='wi wi-cloudy';
-        break;
-    case 'broken clouds':
-    case 'few clouds':
-    case 'scattered clouds': 
-        result+='wi wi-day-cloudy';
-        break;
-
-    default: 
-        result+='wi wi-na';
-    }
-    if(size != 1)
-        result+='\" style=\"font-size: '+size+'em;\"></>';
-    else
-        result+='\"></>';
-    return result;
-
-}
-
-function getTime(val){
-    return new Date(val).toLocaleTimeString("pl-PL")
-}
 
 </script>
 
